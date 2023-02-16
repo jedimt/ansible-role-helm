@@ -1,0 +1,20 @@
+galaxy_info:
+  author: jedimt
+  role_name: helm_install
+  description: Install Helm
+
+  license: MIT
+
+  min_ansible_version: "5"
+
+  platforms:
+    - name: Ubuntu
+      versions:
+        - focal
+        - xenial
+        - jammy
+
+  galaxy_tags:
+    - helm
+
+dependencies: []

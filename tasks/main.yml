@@ -1,0 +1,62 @@
+---
+# tasks file for ansible-role-helm-install
+
+- name: Create download directory
+  ansible.builtin.file:
+    state: directory
+    mode: 'u=rwx,go=rx'
+    dest: '{{ helm_download_dir }}'
+
+- name: Download sha256sum
+  ansible.builtin.get_url:
+    url: '{{ helm_mirror }}/{{ helm_filename }}.sha256'
+    dest: '{{ helm_download_dir }}/{{ helm_filename }}.sha256'
+    force: false
+    validate_certs: true
+    mode: 'u=rw,go=r'
+
+- name: Read sha256sum
+  ansible.builtin.slurp:
+    src: '{{ helm_download_dir }}/{{ helm_filename }}.sha256'
+  register: helm_sha256sum
+
+- name: Download Helm
+  ansible.builtin.get_url:
+    url: '{{ helm_mirror }}/{{ helm_filename }}'
+    dest: '{{ helm_download_dir }}/{{ helm_filename }}'
+    checksum: 'sha256:{{ helm_sha256sum.content | b64decode | trim }}'
+    force: false
+    validate_certs: true
+    mode: 'u=rw,go=r'
+
+- name: Create the Helm installation dir
+  become: true
+  ansible.builtin.file:
+    state: directory
+    owner: root
+    group: root
+    mode: 'u=rwx,go=rx'
+    dest: '{{ helm_install_dir }}'
+
+- name: Install Helm
+  become: true
+  ansible.builtin.unarchive:
+    src: '{{ helm_download_dir }}/{{ helm_filename }}'
+    remote_src: true
+    dest: '{{ helm_install_dir }}'
+    extra_opts:
+      - '--strip-components=1'
+    owner: root
+    group: root
+    mode: 'o-w'
+    creates: '{{ helm_install_dir }}/helm'
+
+- name: Create helm link
+  become: true
+  ansible.builtin.file:
+    src: '{{ helm_install_dir }}/helm'
+    dest: '/usr/local/bin/helm'
+    state: link
+    owner: root
+    group: root
+    mode: 'u=rwx,go=rx'
