@@ -1,6 +1,6 @@
 galaxy_info:
   author: jedimt
-  role_name: helm_install
+  role_name: helm
   description: Install Helm
 
   license: MIT

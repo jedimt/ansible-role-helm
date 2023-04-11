@@ -56,7 +56,7 @@ Example Playbook
 
     - hosts: servers
       roles:
-         - { role: jedimt.helm_install, helm_version: '3.11.1' }
+         - { role: jedimt.helm, helm_version: '3.11.1' }
 
 License
 -------
